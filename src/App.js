@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import logo from './logo.svg';
 import './App.css';
-
-injectTapEventPlugin();
 
 class App extends Component {
   render() {
