@@ -24,13 +24,14 @@ class SideBar extends React.Component {
     this.listItemClicked = this.listItemClicked.bind(this);
   }
 
-  listItemClicked(value) {
+  listItemClicked(value, text) {
+    this.props.updateAppTitle(text);
     this.props.router.push(`/${value}`);
   }
 
   render() {
     return (
-      <SelectableList onSelectionChange={this.listItemClicked} defaultValue="account-summary">
+      <SelectableList onSelectionChange={this.listItemClicked} defaultValue="settings">
         <ListItem value="account-summary" primaryText="Accounts Summary" leftIcon={<Home />} />
         <Divider />
         <ListItem primaryText="Expenses" value="expenses" leftIcon={<ShoppingBasket />} />
@@ -53,7 +54,8 @@ class SideBar extends React.Component {
 SideBar.propTypes = {
   router: React.PropTypes.shape({
     push: React.PropTypes.func.isRequired
-  })
+  }),
+  updateAppTitle: React.PropTypes.func.isRequired
 };
 
 export default withRouter(SideBar);
