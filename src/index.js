@@ -16,7 +16,7 @@ import IncomeContainer from './components/IncomeContainer';
 import InvestmentsContainer from './components/InvestmentsContainer';
 import PeopleContainer from './components/PeopleContainer';
 import SavingsContainer from './components/SavingsContainer';
-import SettingsContainer from './components/SettingsContainer';
+import SettingsContainer from './components/settings/SettingsContainer';
 
 injectTapEventPlugin();
 

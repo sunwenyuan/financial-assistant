@@ -3,18 +3,24 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import './App.css';
 
-import SideBarMenu from './components/SideBarMenu';
+import SideBar from './components/SideBar';
+import AppHeader from './components/AppHeader';
 
 class App extends Component {
   render() {
     return (
       <MuiThemeProvider>
         <div className="App">
-          <div className="side-bar">
-            <SideBarMenu />
+          <div className="header">
+            <AppHeader />
           </div>
-          <div className="content-wrap">
-            {this.props.children}
+          <div className="main">
+            <div className="side-bar">
+              <SideBar />
+            </div>
+            <div className="content-wrap">
+              {this.props.children}
+            </div>
           </div>
         </div>
       </MuiThemeProvider>
