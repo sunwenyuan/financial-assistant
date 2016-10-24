@@ -47,3 +47,15 @@
   overflow-x: hidden;
   overflow-y: auto;
 }
+
+/* ImportContainer.js */
+.import-container {
+  width: 100%;
+  height: 100%;
+}
+
+.import-table-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}

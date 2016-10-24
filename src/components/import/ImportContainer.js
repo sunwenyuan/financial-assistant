@@ -1,21 +1,33 @@
 import XLSX from 'xlsx';
 import React from 'react';
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
+import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
+import IconButton from 'material-ui/IconButton';
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import convertOkq8Data from '../../utils/convertOkq8Data';
-import convertSebData from '../../utils/convertSebData';
+import formatRawData from '../../utils/formatRawData';
+
+const tableHeaderMapping = {
+  date: 'Date',
+  receiver: 'Receiver',
+  amount: 'Amount',
+  type: 'Type',
+  needAttention: 'Need Attention'
+};
 
 class ImportContainer extends React.Component {
   constructor() {
     super();
     this.handleBankSelectionChange = this.handleBankSelectionChange.bind(this);
     this.handleFileSelectionChange = this.handleFileSelectionChange.bind(this);
+    this.renderTableRow = this.renderTableRow.bind(this);
+    this.deleteRecordFromTransaction = this.deleteRecordFromTransaction.bind(this);
     this.state = {
-      bank: 'seb',
+      bank: 'okq8',
       transactions: []
     };
   }
@@ -32,21 +44,7 @@ class ImportContainer extends React.Component {
     reader.onload = (readerLoadEvent) => {
       const data = readerLoadEvent.target.result;
       const workbook = XLSX.read(data, { type: 'binary' });
-      const bank = this.state.bank;
-      // console.log(workbook);
-      // console.log(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
-      let transactions;
-      switch (bank) {
-        case 'okq8':
-          transactions = convertOkq8Data(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
-          break;
-        case 'seb':
-          transactions = convertSebData(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
-          break;
-        default:
-          transactions = convertOkq8Data(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
-          break;
-      }
+      const transactions = formatRawData(this.state.bank, XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
       console.log(transactions);
       this.setState({
         transactions
@@ -55,9 +53,32 @@ class ImportContainer extends React.Component {
     reader.readAsBinaryString(file);
   }
 
+  deleteRecordFromTransaction(e) {
+    console.log(e);
+    console.log(this.state.transactions);
+  }
+
+  renderTableRow(record, index) {
+    console.log(record);
+    return (
+      <TableRow key={index}>
+        <TableRowColumn>{record.date}</TableRowColumn>
+        <TableRowColumn>{record.receiver}</TableRowColumn>
+        <TableRowColumn>{record.amount.toString()}</TableRowColumn>
+        <TableRowColumn>{record.type}</TableRowColumn>
+        <TableRowColumn>{record.needAttention}</TableRowColumn>
+        <TableRowColumn>
+          <IconButton onTouchTap={e => this.deleteRecordFromTransaction(e)}>
+            <DeleteIcon />
+          </IconButton>
+        </TableRowColumn>
+      </TableRow>
+    );
+  }
+
   render() {
     return (
-      <div>
+      <div className="import-container">
         <Toolbar>
           <ToolbarGroup>
             <ToolbarTitle text="Select Bank" />
@@ -78,6 +99,26 @@ class ImportContainer extends React.Component {
             <FlatButton label="Import" />
           </ToolbarGroup>
         </Toolbar>
+        <div className="import-table-container">
+          <Table>
+            <TableHeader displaySelectAll={false} enableSelectAll={false}>
+              <TableRow>
+                <TableHeaderColumn>Date</TableHeaderColumn>
+                <TableHeaderColumn>Receiver</TableHeaderColumn>
+                <TableHeaderColumn>Amount</TableHeaderColumn>
+                <TableHeaderColumn>Type</TableHeaderColumn>
+                <TableHeaderColumn>Need Attention</TableHeaderColumn>
+                <TableHeaderColumn>Operations</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody displayRowCheckbox={false}>
+              {
+                this.state.transactions
+                  .map(this.renderTableRow)
+              }
+            </TableBody>
+          </Table>
+        </div>
       </div>
     );
   }
