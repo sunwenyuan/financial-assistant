@@ -31,7 +31,7 @@ class SideBar extends React.Component {
 
   render() {
     return (
-      <SelectableList onSelectionChange={this.listItemClicked} defaultValue="settings">
+      <SelectableList onSelectionChange={this.listItemClicked} defaultValue="import">
         <ListItem value="account-summary" primaryText="Accounts Summary" leftIcon={<Home />} />
         <Divider />
         <ListItem primaryText="Expenses" value="expenses" leftIcon={<ShoppingBasket />} />
