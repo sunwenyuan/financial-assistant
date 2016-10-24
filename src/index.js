@@ -11,7 +11,7 @@ import BillsContainer from './components/BillsContainer';
 import BudgetContainer from './components/BudgetContainer';
 import CashContainer from './components/CashContainer';
 import ExpensesContainer from './components/ExpensesContainer';
-import ImportContainer from './components/ImportContainer';
+import ImportContainer from './components/import/ImportContainer';
 import IncomeContainer from './components/IncomeContainer';
 import InvestmentsContainer from './components/InvestmentsContainer';
 import PeopleContainer from './components/PeopleContainer';

@@ -9,10 +9,17 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 
+const errorTexts = {
+  NONE: '',
+  IS_REQUIRED: 'Family member name is required!',
+  ALREADY_EXISTS: 'Family member already exists!'
+};
 
 class FamilyMemberPanel extends React.Component {
   constructor() {
     super();
+
+    // Bind this
     this.handleEditFamilyMemberTextFieldChange = this.handleEditFamilyMemberTextFieldChange.bind(this);
     this.renderFamilyMemberRow = this.renderFamilyMemberRow.bind(this);
     this.deleteFamilyMember = this.deleteFamilyMember.bind(this);
@@ -21,11 +28,14 @@ class FamilyMemberPanel extends React.Component {
     this.submitFamilyMember = this.submitFamilyMember.bind(this);
     this.closeEditFamilyMemberDialog = this.closeEditFamilyMemberDialog.bind(this);
     this.openEditFamilyMemberDialog = this.openEditFamilyMemberDialog.bind(this);
+
+    // init state
     this.state = {
       familyMembers: ['Wenyuan Sun', 'Ping Jia'],
       isEditFamilyMemberDialogOpen: false,
       familyMemberInEditing: '',
-      newFamilyMember: ''
+      newFamilyMember: '',
+      editFamilyMemberErrorText: errorTexts.NONE
     };
   }
 
@@ -33,6 +43,11 @@ class FamilyMemberPanel extends React.Component {
     this.setState({
       familyMemberInEditing: '',
       newFamilyMember: ''
+    });
+
+    // Set text field error text
+    this.setState({
+      editFamilyMemberErrorText: errorTexts.IS_REQUIRED
     });
     this.openEditFamilyMemberDialog();
   }
@@ -42,18 +57,27 @@ class FamilyMemberPanel extends React.Component {
       familyMemberInEditing: familyMember,
       newFamilyMember: familyMember
     });
+
+    // Set text field error text
+    this.setState({
+      editFamilyMemberErrorText: errorTexts.ALREADY_EXISTS
+    });
     this.openEditFamilyMemberDialog();
   }
 
   submitFamilyMember() {
+    // check if family member value changed
     if (this.state.familyMemberInEditing !== this.state.newFamilyMember) {
       const familyMembers = this.state.familyMembers;
+
       if (this.state.familyMemberInEditing === '') {
+        // if triggered by create family member, just push the new family member to state
         familyMembers.push(this.state.newFamilyMember);
         this.setState({
           familyMembers
         });
       } else {
+        // triggered by edit family member, find index of existing family member and change it
         const index = _.findIndex(familyMembers, familyMember => familyMember === this.state.familyMemberInEditing);
         if (index > -1) {
           familyMembers[index] = this.state.newFamilyMember;
@@ -89,6 +113,21 @@ class FamilyMemberPanel extends React.Component {
   handleEditFamilyMemberTextFieldChange(e) {
     this.setState({
       newFamilyMember: e.target.value
+    });
+
+    // update text field error text
+    let errorText = errorTexts.NONE;
+    if (e.target.value === '') {
+      errorText = errorTexts.IS_REQUIRED;
+    } else {
+      const familyMembers = this.state.familyMembers;
+      const index = _.findIndex(familyMembers, familyMember => familyMember === e.target.value);
+      if (index > -1) {
+        errorText = errorTexts.ALREADY_EXISTS;
+      }
+    }
+    this.setState({
+      editFamilyMemberErrorText: errorText
     });
   }
 
@@ -126,7 +165,12 @@ class FamilyMemberPanel extends React.Component {
 
     return (
       <Dialog title="Family Member" actions={actions} modal open={this.state.isEditFamilyMemberDialogOpen}>
-        <TextField hintText="Family Member Name" defaultValue={this.state.familyMemberInEditing} onChange={this.handleEditFamilyMemberTextFieldChange} />
+        <TextField
+          hintText="Family Member Name"
+          errorText={this.state.editFamilyMemberErrorText}
+          defaultValue={this.state.familyMemberInEditing}
+          onChange={this.handleEditFamilyMemberTextFieldChange}
+        />
       </Dialog>
     );
   }
