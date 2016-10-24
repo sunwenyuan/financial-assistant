@@ -169,7 +169,7 @@ class ExpenseCategoriesPanel extends React.Component {
   }
 
   render() {
-    const createCategoryBtn = <FlatButton label="Create Category" onTouchTap={this.startCreateCategory} />
+    const createCategoryBtn = <FlatButton label="Create Category" onTouchTap={this.startCreateCategory} />;
     return (
       <div>
         <Toolbar>

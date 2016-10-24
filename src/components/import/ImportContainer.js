@@ -6,13 +6,17 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
 
+import convertOkq8Data from '../../utils/convertOkq8Data';
+import convertSebData from '../../utils/convertSebData';
+
 class ImportContainer extends React.Component {
   constructor() {
     super();
     this.handleBankSelectionChange = this.handleBankSelectionChange.bind(this);
     this.handleFileSelectionChange = this.handleFileSelectionChange.bind(this);
     this.state = {
-      bank: 'seb'
+      bank: 'seb',
+      transactions: []
     };
   }
 
@@ -23,8 +27,32 @@ class ImportContainer extends React.Component {
   }
 
   handleFileSelectionChange(e) {
-    const file = e.target.file;
-    console.log(file);
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (readerLoadEvent) => {
+      const data = readerLoadEvent.target.result;
+      const workbook = XLSX.read(data, { type: 'binary' });
+      const bank = this.state.bank;
+      // console.log(workbook);
+      // console.log(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
+      let transactions;
+      switch (bank) {
+        case 'okq8':
+          transactions = convertOkq8Data(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
+          break;
+        case 'seb':
+          transactions = convertSebData(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
+          break;
+        default:
+          transactions = convertOkq8Data(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
+          break;
+      }
+      console.log(transactions);
+      this.setState({
+        transactions
+      });
+    };
+    reader.readAsBinaryString(file);
   }
 
   render() {
