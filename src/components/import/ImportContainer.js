@@ -324,24 +324,22 @@ class ImportContainer extends React.Component {
             <FlatButton label="Import" />
           </ToolbarGroup>
         </Toolbar>
-        <div className="import-table-container">
-          <Table>
-            <TableHeader displaySelectAll={false} enableSelectAll={false}>
-              <TableRow>
-                {
-                  tableHeaderMapping
-                    .map((header, index) => <TableHeaderColumn key={index}>{header[1]}</TableHeaderColumn>)
-                }
-              </TableRow>
-            </TableHeader>
-            <TableBody displayRowCheckbox={false}>
+        <Table>
+          <TableHeader displaySelectAll={false} enableSelectAll={false}>
+            <TableRow>
               {
-                this.state.transactions
-                  .map(this.renderTableRow)
+                tableHeaderMapping
+                  .map((header, index) => <TableHeaderColumn key={index}>{header[1]}</TableHeaderColumn>)
               }
-            </TableBody>
-          </Table>
-        </div>
+            </TableRow>
+          </TableHeader>
+          <TableBody displayRowCheckbox={false}>
+            {
+              this.state.transactions
+                .map(this.renderTableRow)
+            }
+          </TableBody>
+        </Table>
         {
           this.renderNodeDialog()
         }
