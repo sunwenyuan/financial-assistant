@@ -9,6 +9,8 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 
+import base from '../../base';
+
 const errorTexts = {
   NONE: '',
   IS_REQUIRED: 'Family member name is required!',
@@ -28,15 +30,33 @@ class FamilyMemberPanel extends React.Component {
     this.submitFamilyMember = this.submitFamilyMember.bind(this);
     this.closeEditFamilyMemberDialog = this.closeEditFamilyMemberDialog.bind(this);
     this.openEditFamilyMemberDialog = this.openEditFamilyMemberDialog.bind(this);
+    this.getFirebaseEndpoint = this.getFirebaseEndpoint.bind(this);
 
     // init state
     this.state = {
-      familyMembers: ['Wenyuan Sun', 'Ping Jia'],
+      familyMembers: [],
       isEditFamilyMemberDialogOpen: false,
       familyMemberInEditing: '',
       newFamilyMember: '',
       editFamilyMemberErrorText: errorTexts.NONE
     };
+  }
+
+  componentDidMount() {
+    this.ref = base
+      .syncState(this.getFirebaseEndpoint(), {
+        context: this,
+        state: 'familyMembers',
+        asArray: true
+      });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
+
+  getFirebaseEndpoint() {
+    return `users/${this.props.uid}/members`;
   }
 
   startCreateFamilyMember() {
@@ -68,7 +88,7 @@ class FamilyMemberPanel extends React.Component {
   submitFamilyMember() {
     // check if family member value changed
     if (this.state.familyMemberInEditing !== this.state.newFamilyMember) {
-      const familyMembers = this.state.familyMembers;
+      const familyMembers = [...this.state.familyMembers];
 
       if (this.state.familyMemberInEditing === '') {
         // if triggered by create family member, just push the new family member to state
@@ -176,12 +196,11 @@ class FamilyMemberPanel extends React.Component {
   }
 
   render() {
-    const createFamilyMemberBtn = <FlatButton label="Create Member" onTouchTap={this.startCreateFamilyMember} />;
     return (
       <div>
         <Toolbar>
           <ToolbarGroup>
-            {createFamilyMemberBtn}
+            <FlatButton label="Create Member" onTouchTap={this.startCreateFamilyMember} />
           </ToolbarGroup>
         </Toolbar>
         <Table>
@@ -205,5 +224,9 @@ class FamilyMemberPanel extends React.Component {
     );
   }
 }
+
+FamilyMemberPanel.propTypes = {
+  uid: React.PropTypes.string
+};
 
 export default FamilyMemberPanel;

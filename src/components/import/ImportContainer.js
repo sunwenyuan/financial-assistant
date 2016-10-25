@@ -6,18 +6,23 @@ import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
 import formatRawData from '../../utils/formatRawData';
+import base from '../../base';
 
-const tableHeaderMapping = {
-  date: 'Date',
-  receiver: 'Receiver',
-  amount: 'Amount',
-  type: 'Type',
-  needAttention: 'Need Attention'
-};
+const tableHeaderMapping = [
+  ['date', 'Date'],
+  ['receiver', 'Receiver'],
+  ['amount', 'Amount'],
+  ['type', 'Type'],
+  ['category', 'Category'],
+  ['payfor', 'Pay For'],
+  ['isInvestment', 'Is Investment'],
+  ['operations', 'Operations']
+];
 
 class ImportContainer extends React.Component {
   constructor() {
@@ -26,10 +31,44 @@ class ImportContainer extends React.Component {
     this.handleFileSelectionChange = this.handleFileSelectionChange.bind(this);
     this.renderTableRow = this.renderTableRow.bind(this);
     this.deleteRecordFromTransaction = this.deleteRecordFromTransaction.bind(this);
+    this.getFirebaseCategoryEndpoint = this.getFirebaseCategoryEndpoint.bind(this);
+    this.getFirebaseMemberEndpoint = this.getFirebaseMemberEndpoint.bind(this);
+
     this.state = {
       bank: 'okq8',
+      familyMembers: [],
+      categories: [],
       transactions: []
     };
+  }
+
+  componentDidMount() {
+    this.membersRef = base
+      .bindToState(this.getFirebaseMemberEndpoint(), {
+        context: this,
+        state: 'familyMembers',
+        asArray: true
+      });
+
+    this.categoriesRef = base
+      .bindToState(this.getFirebaseCategoryEndpoint(), {
+        context: this,
+        state: 'categories',
+        asArray: true
+      });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.membersRef);
+    base.removeBinding(this.categoriesRef);
+  }
+
+  getFirebaseMemberEndpoint() {
+    return `users/${this.props.uid}/members`;
+  }
+
+  getFirebaseCategoryEndpoint() {
+    return `users/${this.props.uid}/categories`;
   }
 
   handleBankSelectionChange(e, index, value) {
@@ -59,19 +98,81 @@ class ImportContainer extends React.Component {
   }
 
   renderTableRow(record, index) {
-    console.log(record);
+    const rowStyle = {};
+    const rowDisabled = record.type === 'in';
+    if (record.needAttention === true) {
+      rowStyle.backgroundColor = '#F44336';
+    }
     return (
-      <TableRow key={index}>
-        <TableRowColumn>{record.date}</TableRowColumn>
-        <TableRowColumn>{record.receiver}</TableRowColumn>
-        <TableRowColumn>{record.amount.toString()}</TableRowColumn>
-        <TableRowColumn>{record.type}</TableRowColumn>
-        <TableRowColumn>{record.needAttention}</TableRowColumn>
-        <TableRowColumn>
-          <IconButton onTouchTap={e => this.deleteRecordFromTransaction(e)}>
-            <DeleteIcon />
-          </IconButton>
-        </TableRowColumn>
+      <TableRow style={rowStyle} key={index}>
+        {
+          tableHeaderMapping
+            .map((header) => {
+              const [headerName] = [...header];
+              const columnKey = `row_${index}_${headerName}`;
+              if (headerName === 'operations') {
+                return (
+                  <TableRowColumn key={columnKey}>
+                    <IconButton onTouchTap={e => this.deleteRecordFromTransaction(e)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableRowColumn>
+                );
+              } else if (headerName === 'category') {
+                return (
+                  <TableRowColumn key={columnKey}>
+                    <SelectField
+                      hintText="Select Category"
+                      value={record.category}
+                      disabled={rowDisabled}
+                      onChange={this.handleTransactionCategoryChange}
+                    >
+                      {
+                        this.state.categories
+                          .map(category => (<MenuItem key={category} value={category} primaryText={category} />))
+                      }
+                    </SelectField>
+                  </TableRowColumn>
+                );
+              } else if (headerName === 'amount') {
+                return (
+                  <TableRowColumn key={columnKey}>
+                    {record[headerName].toString()}
+                  </TableRowColumn>
+                );
+              } else if (headerName === 'isInvestment') {
+                return (
+                  <TableRowColumn key={columnKey}>
+                    <Checkbox
+                      checked={record[headerName]}
+                      disabled={rowDisabled}
+                    />
+                  </TableRowColumn>
+                );
+              } else if (headerName === 'payfor') {
+                return (
+                  <TableRowColumn key={columnKey}>
+                    <SelectField
+                      hintText="Select Member"
+                      value={record[headerName]}
+                      disabled={rowDisabled}
+                      onChange={this.handlePayforChange}
+                    >
+                      {
+                        this.state.familyMembers
+                          .map(familyMember => (<MenuItem key={familyMember} value={familyMember} primaryText={familyMember} />))
+                      }
+                    </SelectField>
+                  </TableRowColumn>
+                );
+              }
+              return (
+                <TableRowColumn key={columnKey}>
+                  {record[headerName]}
+                </TableRowColumn>
+              );
+            })
+        }
       </TableRow>
     );
   }
@@ -103,12 +204,10 @@ class ImportContainer extends React.Component {
           <Table>
             <TableHeader displaySelectAll={false} enableSelectAll={false}>
               <TableRow>
-                <TableHeaderColumn>Date</TableHeaderColumn>
-                <TableHeaderColumn>Receiver</TableHeaderColumn>
-                <TableHeaderColumn>Amount</TableHeaderColumn>
-                <TableHeaderColumn>Type</TableHeaderColumn>
-                <TableHeaderColumn>Need Attention</TableHeaderColumn>
-                <TableHeaderColumn>Operations</TableHeaderColumn>
+                {
+                  tableHeaderMapping
+                    .map((header, index) => <TableHeaderColumn key={index}>{header[1]}</TableHeaderColumn>)
+                }
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false}>
@@ -123,5 +222,9 @@ class ImportContainer extends React.Component {
     );
   }
 }
+
+ImportContainer.propTypes = {
+  uid: React.PropTypes.string
+};
 
 export default ImportContainer;

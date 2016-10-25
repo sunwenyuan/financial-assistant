@@ -9,6 +9,9 @@ Output data format:
   date:      // transfer date, string 2016-10-18
   type:      // type of transaction, string, possible values: 'in', 'out'
   needAttention:   // If this transaction need manually deal with, boolean
+  category:  // Expense category, string
+  payfor:    // this transaction paid for whom, string
+  isInvestment: // if this is an investment, boolean
 }]
 */
 
@@ -30,7 +33,10 @@ function convertSebData(inputData) {
       receiver: record[sebColumns.receiver],
       date: record[sebColumns.date],
       type,
-      needAttention: false
+      needAttention: false,
+      category: '',
+      payfor: '',
+      isInvestment: false
     };
     outputData.push(outputRecord);
   });
@@ -52,7 +58,10 @@ function convertOkq8Data(inputData) {
       receiver: record[okq8Columns.receiver],
       date: record[okq8Columns.date],
       type: record[okq8Columns.type] === 'Köp' ? 'out' : 'in',
-      needAttention: false
+      needAttention: false,
+      category: '',
+      payfor: '',
+      isInvestment: false
     };
     outputData.push(outputRecord);
   });
@@ -77,7 +86,10 @@ function convertRememberData(inputData) {
       receiver: record[rememberColumns.receiver],
       date: record[rememberColumns.date],
       type,
-      needAttention: false
+      needAttention: false,
+      category: '',
+      payfor: '',
+      isInvestment: false
     };
     outputData.push(outputRecord);
   });

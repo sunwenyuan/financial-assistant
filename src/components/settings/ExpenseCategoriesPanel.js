@@ -9,6 +9,8 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 
+import base from '../../base';
+
 const errorTexts = {
   NONE: '',
   IS_REQUIRED: 'Category name is required!',
@@ -28,6 +30,7 @@ class ExpenseCategoriesPanel extends React.Component {
     this.startEditCategory = this.startEditCategory.bind(this);
     this.deleteCategory = this.deleteCategory.bind(this);
     this.startCreateCategory = this.startCreateCategory.bind(this);
+    this.getFirebaseEndPoint = this.getFirebaseEndPoint.bind(this);
 
     this.state = {
       categories: [],
@@ -36,6 +39,23 @@ class ExpenseCategoriesPanel extends React.Component {
       newCategory: '',
       editCategoryErrorText: errorTexts.NONE
     };
+  }
+
+  componentDidMount() {
+    this.ref = base
+      .syncState(this.getFirebaseEndPoint(), {
+        context: this,
+        state: 'categories',
+        asArray: true
+      });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
+
+  getFirebaseEndPoint() {
+    return `users/${this.props.uid}/categories`;
   }
 
   closeEditCategoryDialog() {
@@ -87,7 +107,7 @@ class ExpenseCategoriesPanel extends React.Component {
   submitCategory() {
     // check if category name changed
     if (this.state.categoryInEditing !== this.state.newCategory) {
-      const categories = this.state.categories;
+      const categories = [...this.state.categories];
       if (this.state.categoryInEditing === '') {
         // triggered by create category, just push the new category to state
         categories.push(this.state.newCategory);
@@ -198,5 +218,9 @@ class ExpenseCategoriesPanel extends React.Component {
     );
   }
 }
+
+ExpenseCategoriesPanel.propTypes = {
+  uid: React.PropTypes.string
+};
 
 export default ExpenseCategoriesPanel;
