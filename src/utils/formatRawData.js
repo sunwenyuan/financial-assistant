@@ -12,6 +12,7 @@ Output data format:
   category:  // Expense category, string
   payfor:    // this transaction paid for whom, string
   isInvestment: // if this is an investment, boolean
+  note:       // string
 }]
 */
 
@@ -36,7 +37,8 @@ function convertSebData(inputData) {
       needAttention: false,
       category: '',
       payfor: '',
-      isInvestment: false
+      isInvestment: false,
+      note: ''
     };
     outputData.push(outputRecord);
   });
@@ -61,7 +63,8 @@ function convertOkq8Data(inputData) {
       needAttention: false,
       category: '',
       payfor: '',
-      isInvestment: false
+      isInvestment: false,
+      note: ''
     };
     outputData.push(outputRecord);
   });
@@ -89,7 +92,8 @@ function convertRememberData(inputData) {
       needAttention: false,
       category: '',
       payfor: '',
-      isInvestment: false
+      isInvestment: false,
+      note: ''
     };
     outputData.push(outputRecord);
   });

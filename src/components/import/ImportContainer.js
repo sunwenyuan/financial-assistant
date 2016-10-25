@@ -9,6 +9,8 @@ import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
+import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import Dialog from 'material-ui/Dialog';
 
 import formatRawData from '../../utils/formatRawData';
 import base from '../../base';
@@ -21,6 +23,7 @@ const tableHeaderMapping = [
   ['category', 'Category'],
   ['payfor', 'Pay For'],
   ['isInvestment', 'Is Investment'],
+  ['note', 'Note'],
   ['operations', 'Operations']
 ];
 
@@ -33,12 +36,23 @@ class ImportContainer extends React.Component {
     this.deleteRecordFromTransaction = this.deleteRecordFromTransaction.bind(this);
     this.getFirebaseCategoryEndpoint = this.getFirebaseCategoryEndpoint.bind(this);
     this.getFirebaseMemberEndpoint = this.getFirebaseMemberEndpoint.bind(this);
+    this.handleTransactionCategoryChange = this.handleTransactionCategoryChange.bind(this);
+    this.handlePayforChange = this.handlePayforChange.bind(this);
+    this.handleIsInvestmentChange = this.handleIsInvestmentChange.bind(this);
+    this.handleNoteChange = this.handleNoteChange.bind(this);
+    this.openNoteDialog = this.openNoteDialog.bind(this);
+    this.closeNoteDialog = this.closeNoteDialog.bind(this);
+    this.submitNote = this.submitNote.bind(this);
+
+    this.note = '';
+    this.rowNumber = null;
 
     this.state = {
       bank: 'okq8',
       familyMembers: [],
       categories: [],
-      transactions: []
+      transactions: [],
+      isNoteDialogOpen: false
     };
   }
 
@@ -71,6 +85,34 @@ class ImportContainer extends React.Component {
     return `users/${this.props.uid}/categories`;
   }
 
+  openNoteDialog(columnKey) {
+    const rowNumber = columnKey.split('_')[1];
+    const record = this.state.transactions[rowNumber];
+    this.note = record.note;
+    this.rowNumber = rowNumber;
+    this.setState({
+      isNoteDialogOpen: true
+    });
+  }
+
+  closeNoteDialog() {
+    this.setState({
+      isNoteDialogOpen: false
+    });
+  }
+
+  submitNote() {
+    const rowNumber = this.rowNumber;
+    const transactions = [...this.state.transactions];
+    transactions[rowNumber].note = this.note;
+    this.rowNumber = null;
+    this.note = '';
+    this.setState({
+      transactions
+    });
+    this.closeNoteDialog();
+  }
+
   handleBankSelectionChange(e, index, value) {
     this.setState({
       bank: value
@@ -84,7 +126,7 @@ class ImportContainer extends React.Component {
       const data = readerLoadEvent.target.result;
       const workbook = XLSX.read(data, { type: 'binary' });
       const transactions = formatRawData(this.state.bank, XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
-      console.log(transactions);
+      // console.log(transactions);
       this.setState({
         transactions
       });
@@ -92,9 +134,68 @@ class ImportContainer extends React.Component {
     reader.readAsBinaryString(file);
   }
 
-  deleteRecordFromTransaction(e) {
-    console.log(e);
-    console.log(this.state.transactions);
+  deleteRecordFromTransaction(columnKey) {
+    const rowNumber = columnKey.split('_')[1];
+    const transactions = [...this.state.transactions];
+    const newTransactions = [...transactions.slice(0, rowNumber), ...transactions.slice(rowNumber + 1)];
+    this.setState({
+      transactions: newTransactions
+    });
+  }
+
+  handleTransactionCategoryChange(columnKey, payload) {
+    const rowNumber = columnKey.split('_')[1];
+    const transactions = [...this.state.transactions];
+    transactions[rowNumber].category = payload;
+    this.setState({
+      transactions
+    });
+  }
+
+  handlePayforChange(columnKey, payload) {
+    const rowNumber = columnKey.split('_')[1];
+    const transactions = [...this.state.transactions];
+    transactions[rowNumber].payfor = payload;
+    this.setState({
+      transactions
+    });
+  }
+
+  handleIsInvestmentChange(columnKey, payload) {
+    const rowNumber = columnKey.split('_')[1];
+    const transactions = [...this.state.transactions];
+    transactions[rowNumber].isInvestment = payload;
+    this.setState({
+      transactions
+    });
+  }
+
+  handleNoteChange(e) {
+    this.note = e.target.value;
+  }
+
+  renderNodeDialog() {
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        primary
+        onTouchTap={this.closeNoteDialog}
+      />,
+      <FlatButton
+        label="submit"
+        primary
+        onTouchTap={this.submitNote}
+      />
+    ];
+    return (
+      <Dialog title="Note" actions={actions} modal open={this.state.isNoteDialogOpen}>
+        <TextField
+          hintText="Note"
+          defaultValue={this.note}
+          onChange={this.handleNoteChange}
+        />
+      </Dialog>
+    );
   }
 
   renderTableRow(record, index) {
@@ -113,8 +214,19 @@ class ImportContainer extends React.Component {
               if (headerName === 'operations') {
                 return (
                   <TableRowColumn key={columnKey}>
-                    <IconButton onTouchTap={e => this.deleteRecordFromTransaction(e)}>
+                    <IconButton
+                      onTouchTap={() => {
+                        this.deleteRecordFromTransaction(columnKey);
+                      }}
+                    >
                       <DeleteIcon />
+                    </IconButton>
+                    <IconButton
+                      onTouchTap={() => {
+                        this.openNoteDialog(columnKey);
+                      }}
+                    >
+                      <EditIcon />
                     </IconButton>
                   </TableRowColumn>
                 );
@@ -125,11 +237,18 @@ class ImportContainer extends React.Component {
                       hintText="Select Category"
                       value={record.category}
                       disabled={rowDisabled}
-                      onChange={this.handleTransactionCategoryChange}
+                      onChange={(e, selectedNumber, payload) => {
+                        this.handleTransactionCategoryChange(columnKey, payload);
+                      }}
                     >
                       {
                         this.state.categories
-                          .map(category => (<MenuItem key={category} value={category} primaryText={category} />))
+                          .map((category) => {
+                            if (category !== 'Income') {
+                              return (<MenuItem key={category} value={category} primaryText={category} />);
+                            }
+                            return '';
+                          })
                       }
                     </SelectField>
                   </TableRowColumn>
@@ -146,6 +265,9 @@ class ImportContainer extends React.Component {
                     <Checkbox
                       checked={record[headerName]}
                       disabled={rowDisabled}
+                      onCheck={(e, isInputChecked) => {
+                        this.handleIsInvestmentChange(columnKey, isInputChecked);
+                      }}
                     />
                   </TableRowColumn>
                 );
@@ -156,7 +278,9 @@ class ImportContainer extends React.Component {
                       hintText="Select Member"
                       value={record[headerName]}
                       disabled={rowDisabled}
-                      onChange={this.handlePayforChange}
+                      onChange={(e, selectedNumber, payload) => {
+                        this.handlePayforChange(columnKey, payload);
+                      }}
                     >
                       {
                         this.state.familyMembers
@@ -218,6 +342,9 @@ class ImportContainer extends React.Component {
             </TableBody>
           </Table>
         </div>
+        {
+          this.renderNodeDialog()
+        }
       </div>
     );
   }
