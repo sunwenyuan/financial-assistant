@@ -6,7 +6,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import App from './App';
 import './index.css';
 
-import AccountsSummaryContainer from './components/AccountsSummaryContainer';
+import SummaryContainer from './components/summary/SummaryContainer';
 import BillsContainer from './components/BillsContainer';
 import BudgetContainer from './components/BudgetContainer';
 import CashContainer from './components/CashContainer';
@@ -25,7 +25,7 @@ const Root = (
   <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={WelcomePage} />
-      <Route path="account-summary" component={AccountsSummaryContainer} />
+      <Route path="summary" component={SummaryContainer} />
       <Route path="expenses" component={ExpensesContainer} />
       <Route path="income" component={IncomeContainer} />
       <Route path="bills" component={BillsContainer} />
