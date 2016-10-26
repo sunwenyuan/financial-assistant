@@ -6,7 +6,6 @@ import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
-import Checkbox from 'material-ui/Checkbox';
 import IconButton from 'material-ui/IconButton';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
@@ -22,7 +21,6 @@ const tableHeaderMapping = [
   ['type', 'Type'],
   ['category', 'Category'],
   ['payfor', 'Pay For'],
-  ['isInvestment', 'Is Investment'],
   ['note', 'Note'],
   ['operations', 'Operations']
 ];
@@ -38,7 +36,6 @@ class ImportContainer extends React.Component {
     this.getFirebaseMemberEndpoint = this.getFirebaseMemberEndpoint.bind(this);
     this.handleTransactionCategoryChange = this.handleTransactionCategoryChange.bind(this);
     this.handlePayforChange = this.handlePayforChange.bind(this);
-    this.handleIsInvestmentChange = this.handleIsInvestmentChange.bind(this);
     this.handleNoteChange = this.handleNoteChange.bind(this);
     this.openNoteDialog = this.openNoteDialog.bind(this);
     this.closeNoteDialog = this.closeNoteDialog.bind(this);
@@ -161,15 +158,6 @@ class ImportContainer extends React.Component {
     });
   }
 
-  handleIsInvestmentChange(columnKey, payload) {
-    const rowNumber = columnKey.split('_')[1];
-    const transactions = [...this.state.transactions];
-    transactions[rowNumber].isInvestment = payload;
-    this.setState({
-      transactions
-    });
-  }
-
   handleNoteChange(e) {
     this.note = e.target.value;
   }
@@ -243,12 +231,7 @@ class ImportContainer extends React.Component {
                     >
                       {
                         this.state.categories
-                          .map((category) => {
-                            if (category !== 'Income') {
-                              return (<MenuItem key={category} value={category} primaryText={category} />);
-                            }
-                            return '';
-                          })
+                          .map(category => (<MenuItem key={category} value={category} primaryText={category} />))
                       }
                     </SelectField>
                   </TableRowColumn>
@@ -257,18 +240,6 @@ class ImportContainer extends React.Component {
                 return (
                   <TableRowColumn key={columnKey}>
                     {record[headerName].toString()}
-                  </TableRowColumn>
-                );
-              } else if (headerName === 'isInvestment') {
-                return (
-                  <TableRowColumn key={columnKey}>
-                    <Checkbox
-                      checked={record[headerName]}
-                      disabled={rowDisabled}
-                      onCheck={(e, isInputChecked) => {
-                        this.handleIsInvestmentChange(columnKey, isInputChecked);
-                      }}
-                    />
                   </TableRowColumn>
                 );
               } else if (headerName === 'payfor') {

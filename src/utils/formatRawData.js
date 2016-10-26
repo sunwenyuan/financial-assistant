@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import BigNumber from 'bignumber.js';
+import analyzeData from './analyzeData';
 
 /*
 Output data format:
@@ -11,11 +12,11 @@ Output data format:
   needAttention:   // If this transaction need manually deal with, boolean
   category:  // Expense category, string
   payfor:    // this transaction paid for whom, string
-  isInvestment: // if this is an investment, boolean
   note:       // string
 }]
 */
 
+// Convert SEB data
 const sebColumns = {
   amount: 'Belopp',
   receiver: 'Text / mottagare',
@@ -37,14 +38,15 @@ function convertSebData(inputData) {
       needAttention: false,
       category: '',
       payfor: '',
-      isInvestment: false,
       note: ''
     };
     outputData.push(outputRecord);
   });
   return outputData;
 }
+// End of SEB data
 
+// Convert OKQ8 data
 const okq8Columns = {
   amount: 'Belopp SEK',
   receiver: 'Inköpsställe/Butiksnamn',
@@ -59,18 +61,19 @@ function convertOkq8Data(inputData) {
       amount: new BigNumber(record[okq8Columns.amount]),
       receiver: record[okq8Columns.receiver],
       date: record[okq8Columns.date],
-      type: record[okq8Columns.type] === 'Köp' ? 'out' : 'in',
+      type: (record[okq8Columns.type] === 'Köp' || record[okq8Columns.type] === 'Reserverat belopp') ? 'out' : 'in',
       needAttention: false,
       category: '',
       payfor: '',
-      isInvestment: false,
       note: ''
     };
     outputData.push(outputRecord);
   });
   return outputData;
 }
+// End of OKQ8 data
 
+// Convert Remember data
 const rememberColumns = {
   amount: 'Fakturabelopp',
   receiver: 'Detaljer',
@@ -92,21 +95,24 @@ function convertRememberData(inputData) {
       needAttention: false,
       category: '',
       payfor: '',
-      isInvestment: false,
       note: ''
     };
     outputData.push(outputRecord);
   });
   return outputData;
 }
+// End of Remember data
 
 function formatRawData(bank = 'seb', inputData) {
+  let formatedData;
   if (bank === 'okq8') {
-    return convertOkq8Data(inputData);
+    formatedData = convertOkq8Data(inputData);
   } else if (bank === 'remember') {
-    return convertRememberData(inputData);
+    formatedData = convertRememberData(inputData);
+  } else {
+    formatedData = convertSebData(inputData);
   }
-  return convertSebData(inputData);
+  return analyzeData(formatedData);
 }
 
 export default formatRawData;
