@@ -1,4 +1,5 @@
 import XLSX from 'xlsx';
+import _ from 'lodash';
 import React from 'react';
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
@@ -12,13 +13,13 @@ import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import Dialog from 'material-ui/Dialog';
 
 import formatRawData from '../../utils/formatRawData';
+import { aggregateByMonth, mergeData } from '../../utils/importHelper';
 import base from '../../base';
 
 const tableHeaderMapping = [
   ['date', 'Date'],
   ['receiver', 'Receiver'],
   ['amount', 'Amount'],
-  ['type', 'Type'],
   ['category', 'Category'],
   ['payfor', 'Pay For'],
   ['note', 'Note'],
@@ -40,6 +41,7 @@ class ImportContainer extends React.Component {
     this.openNoteDialog = this.openNoteDialog.bind(this);
     this.closeNoteDialog = this.closeNoteDialog.bind(this);
     this.submitNote = this.submitNote.bind(this);
+    this.doImport = this.doImport.bind(this);
 
     this.note = '';
     this.rowNumber = null;
@@ -80,6 +82,14 @@ class ImportContainer extends React.Component {
 
   getFirebaseCategoryEndpoint() {
     return `users/${this.props.uid}/categories`;
+  }
+
+  getFirebaseTransactionsEndpoint(month) {
+    let endpoint = `users/${this.props.uid}/transactions`;
+    if (month !== undefined) {
+      endpoint += `/${month}`;
+    }
+    return endpoint;
   }
 
   openNoteDialog(columnKey) {
@@ -160,6 +170,49 @@ class ImportContainer extends React.Component {
 
   handleNoteChange(e) {
     this.note = e.target.value;
+  }
+
+  doImport() {
+    const dataAggregatedByMonth = aggregateByMonth(this.state.transactions);
+    console.log(dataAggregatedByMonth);
+    const monthArray = Object.keys(dataAggregatedByMonth);
+
+    const fetchPromisesArray = [];
+    _.forEach(monthArray, (month) => {
+      const fetchPromise = base
+        .fetch(this.getFirebaseTransactionsEndpoint(month), {
+          context: this,
+          isArray: true
+        });
+      fetchPromisesArray.push(fetchPromise);
+    });
+
+    Promise
+      .all(fetchPromisesArray)
+      .then((responses) => {
+        const mergedData = mergeData(responses, dataAggregatedByMonth);
+        console.log(mergedData);
+
+        const postPromisesArray = [];
+        _.forEach(monthArray, (month) => {
+          const postPromise = base
+            .post(this.getFirebaseTransactionsEndpoint(month), {
+              data: mergedData[month]
+            });
+          postPromisesArray.push(postPromise);
+        });
+
+        Promise
+          .all(postPromisesArray)
+          .then(() => {
+            this.setState({
+              transactions: []
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
   }
 
   renderNodeDialog() {
@@ -292,7 +345,10 @@ class ImportContainer extends React.Component {
               type="file"
               onChange={this.handleFileSelectionChange}
             />
-            <FlatButton label="Import" />
+            <FlatButton
+              label="Import"
+              onTouchTap={this.doImport}
+            />
           </ToolbarGroup>
         </Toolbar>
         <Table>

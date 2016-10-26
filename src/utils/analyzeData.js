@@ -18,14 +18,14 @@ const dailyExpensesKeywords = ['ica', 'coop', 'city gross', 'matrix', 'oriental 
 const needAttentionKeywords = ['paypal', 'klarna'];
 const electronicsKeywords = ['apple', 'media markt', 'elgiganten'];
 const carKeywords = ['circle', 'statoil', 'qpark', 'parkman', 'dekra', 'trängselskatt transports'];
-const clothingKeywords = ['intersport', 'polarn o.pyret', 'polarn o pyr', 'polarn', 'decathlon', 'nike', 'ecco', 'timberland', 'lindex', 'åhlens', 'h m', 'h&m', 'björn borg', 'jack&jones', 'dea axelsson', 'esprit', 'stadium', 'asics', 'dressman'];
+const clothingKeywords = ['intersport', 'polarn o.pyret', 'polarn o pyr', 'polarn', 'decathlon', 'nike', 'ecco', 'timberland', 'lindex', 'åhlens', 'h m', 'h&m', 'björn borg', 'jack&jones', 'dea axelsson', 'esprit', 'stadium', 'asics', 'dressman', 'levi\'s'];
 const healthKeywords = ['sats', 'apotek', 'apoteket', 'karolinska'];
 const toysKeywords = ['brleksaker', 'toysrus', 'lekia'];
 const homeKeywords = ['ikea', 'lån', 'hsb', 'bredbandsbolaget', 'skype', 'tele2', 'comviq'];
 const restaurantKeywords = ['restaurang tang', 'burger', 'mcdonalds', 'mcdonald', 'max', 'subway', 'restaurang', 'pizzeria', 'sushi', 'starbucks', 'pizza', 'yogiboost', 'coffee'];
 const insuranceKeywords = ['if', 'trygg-hansa'];
 const investmentKeywords = ['isk'];
-const educationKeywords = ['arvato', 'huddinge kommun'];
+const educationKeywords = ['arvato', 'huddinge kommun', 'trafikskola'];
 
 const needAttentionLimit = 2000;
 
