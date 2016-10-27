@@ -8,12 +8,12 @@ import SetBudgetPanel from './SetBudgetPanel';
 class SettingsContainer extends React.Component {
   render() {
     return (
-      <Tabs>
+      <Tabs className="settings-container">
         <Tab label="Family Members">
-          <FamilyMemberPanel />
+          <FamilyMemberPanel uid={this.props.uid} />
         </Tab>
         <Tab label="Expense Categories">
-          <ExpenseCategoriesPanel />
+          <ExpenseCategoriesPanel uid={this.props.uid} />
         </Tab>
         <Tab label="Set Budget">
           <SetBudgetPanel />
@@ -22,5 +22,9 @@ class SettingsContainer extends React.Component {
     );
   }
 }
+
+SettingsContainer.propTypes = {
+  uid: React.PropTypes.string
+};
 
 export default SettingsContainer;

@@ -1,29 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, browserHistory } from 'react-router';
+import { Router, Route, browserHistory, IndexRoute } from 'react-router';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import App from './App';
 import './index.css';
 
-import AccountsSummaryContainer from './components/AccountsSummaryContainer';
+import SummaryContainer from './components/summary/SummaryContainer';
 import BillsContainer from './components/BillsContainer';
 import BudgetContainer from './components/BudgetContainer';
 import CashContainer from './components/CashContainer';
-import ExpensesContainer from './components/ExpensesContainer';
+import ExpensesContainer from './components/expenses/ExpensesContainer';
 import ImportContainer from './components/import/ImportContainer';
-import IncomeContainer from './components/IncomeContainer';
-import InvestmentsContainer from './components/InvestmentsContainer';
+import IncomeContainer from './components/income/IncomeContainer';
+import InvestmentsContainer from './components/investments/InvestmentsContainer';
 import PeopleContainer from './components/PeopleContainer';
 import SavingsContainer from './components/SavingsContainer';
 import SettingsContainer from './components/settings/SettingsContainer';
+import WelcomePage from './components/WelcomePage';
 
 injectTapEventPlugin();
 
 const Root = (
   <Router history={browserHistory}>
     <Route path="/" component={App}>
-      <Route path="account-summary" component={AccountsSummaryContainer} />
+      <IndexRoute component={WelcomePage} />
+      <Route path="summary" component={SummaryContainer} />
       <Route path="expenses" component={ExpensesContainer} />
       <Route path="income" component={IncomeContainer} />
       <Route path="bills" component={BillsContainer} />
