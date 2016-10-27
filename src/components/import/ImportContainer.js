@@ -13,7 +13,7 @@ import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import Dialog from 'material-ui/Dialog';
 
 import formatRawData from '../../utils/formatRawData';
-import { aggregateByMonth, mergeData } from '../../utils/importHelper';
+import { aggregateByMonth, mergeData, getSummaryData } from '../../utils/importHelper';
 import base from '../../base';
 
 const tableHeaderMapping = [
@@ -35,6 +35,7 @@ class ImportContainer extends React.Component {
     this.deleteRecordFromTransaction = this.deleteRecordFromTransaction.bind(this);
     this.getFirebaseCategoryEndpoint = this.getFirebaseCategoryEndpoint.bind(this);
     this.getFirebaseMemberEndpoint = this.getFirebaseMemberEndpoint.bind(this);
+    this.getFirebaseSummaryEndpoint = this.getFirebaseSummaryEndpoint.bind(this);
     this.handleTransactionCategoryChange = this.handleTransactionCategoryChange.bind(this);
     this.handlePayforChange = this.handlePayforChange.bind(this);
     this.handleNoteChange = this.handleNoteChange.bind(this);
@@ -86,6 +87,14 @@ class ImportContainer extends React.Component {
 
   getFirebaseTransactionsEndpoint(month) {
     let endpoint = `users/${this.props.uid}/transactions`;
+    if (month !== undefined) {
+      endpoint += `/${month}`;
+    }
+    return endpoint;
+  }
+
+  getFirebaseSummaryEndpoint(month) {
+    let endpoint = `users/${this.props.uid}/summary`;
     if (month !== undefined) {
       endpoint += `/${month}`;
     }
@@ -195,11 +204,17 @@ class ImportContainer extends React.Component {
 
         const postPromisesArray = [];
         _.forEach(monthArray, (month) => {
-          const postPromise = base
+          const postTransactionsPromise = base
             .post(this.getFirebaseTransactionsEndpoint(month), {
               data: mergedData[month]
             });
-          postPromisesArray.push(postPromise);
+          postPromisesArray.push(postTransactionsPromise);
+
+          const postSummaryPromise = base
+            .post(this.getFirebaseSummaryEndpoint(month), {
+              data: getSummaryData(mergedData[month])
+            });
+          postPromisesArray.push(postSummaryPromise);
         });
 
         Promise

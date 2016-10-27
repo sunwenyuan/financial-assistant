@@ -8,7 +8,6 @@ import NextIcon from 'material-ui/svg-icons/av/skip-next';
 
 import base from '../../base';
 import Chart from './Chart';
-import getSummaryData from '../../utils/getSummaryData';
 import getPieOptions from '../../utils/chartHelper';
 
 class SummaryContainer extends React.Component {
@@ -30,14 +29,8 @@ class SummaryContainer extends React.Component {
     this.getSummaryData(this.state.month);
   }
 
-  componentWillUnmount() {
-    if (this.ref) {
-      base.removeBinding(this.ref);
-    }
-  }
-
   getFirebaseEndpoint(month) {
-    let endpoint = `users/${this.props.uid}/transactions`;
+    let endpoint = `users/${this.props.uid}/summary`;
     if (month !== undefined) {
       endpoint += `/${month}`;
     }
@@ -50,8 +43,7 @@ class SummaryContainer extends React.Component {
         context: this,
         isArray: true
       })
-      .then((transactions) => {
-        const summaryData = getSummaryData(transactions);
+      .then((summaryData) => {
         const pieOptions = getPieOptions(month, summaryData);
         this.setState({
           month
