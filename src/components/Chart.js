@@ -9,6 +9,7 @@ class Chart extends React.Component {
     if (this.props.modules) {
       _.forEach(this.props.modules, module => module(Highcharts));
     }
+
     // Set container which the chart should render to.
     this.chart = new Highcharts.Chart(
       this.props.container,
@@ -19,6 +20,10 @@ class Chart extends React.Component {
   // Destroy chart before unmount.
   componentWillUnmount() {
     this.chart.destroy();
+  }
+
+  resizeChart() {
+    this.chart.redraw();
   }
 
   // Create the div which the chart will be rendered to.

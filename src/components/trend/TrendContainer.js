@@ -21,6 +21,7 @@ class TrendContainer extends React.Component {
     this.goPreviousCategory = this.goPreviousCategory.bind(this);
     this.goNextCategory = this.goNextCategory.bind(this);
     this.renderChart = this.renderChart.bind(this);
+    this.handleResize = this.handleResize.bind(this);
 
     const now = moment().format('YYYY-MM');
     this.months = [];
@@ -65,6 +66,14 @@ class TrendContainer extends React.Component {
       .catch((err) => {
         console.log(err);
       });
+
+    // add listener to browser window resize
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount() {
+    // remove listener to browser window resize
+    window.removeEventListener("resize", this.handleResize);
   }
 
   getFirebaseCategoryEndpoint() {
@@ -87,6 +96,11 @@ class TrendContainer extends React.Component {
       const index = this.state.currentCategoryIndex + 1;
       this.renderChart(index);
     }
+  }
+
+  handleResize() {
+    ReactDOM.unmountComponentAtNode(document.getElementById('trend-chart-container'));
+    this.renderChart(this.state.currentCategoryIndex);
   }
 
   renderChart(currentCategoryIndex) {

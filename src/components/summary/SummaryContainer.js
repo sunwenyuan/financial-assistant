@@ -19,6 +19,7 @@ class SummaryContainer extends React.Component {
     this.goNextMonth = this.goNextMonth.bind(this);
     this.getFirebaseEndpoint = this.getFirebaseEndpoint.bind(this);
     this.getSummaryData = this.getSummaryData.bind(this);
+    this.handleResize = this.handleResize.bind(this);
 
     const now = moment().format('YYYY-MM');
     this.state = {
@@ -28,6 +29,14 @@ class SummaryContainer extends React.Component {
 
   componentDidMount() {
     this.getSummaryData(this.state.month);
+
+    // add listener to browser window resize
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount() {
+    // remove listener to browser window resize
+    window.removeEventListener("resize", this.handleResize);
   }
 
   getFirebaseEndpoint(month) {
@@ -57,6 +66,11 @@ class SummaryContainer extends React.Component {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  handleResize() {
+    ReactDOM.unmountComponentAtNode(document.getElementById('summary-chart'));
+    this.getSummaryData(this.state.month);
   }
 
   goPreviousMonth() {
