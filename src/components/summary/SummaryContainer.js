@@ -38,7 +38,7 @@ class SummaryContainer extends React.Component {
   }
 
   getSummaryData(month) {
-    this.ref = base
+    base
       .fetch(this.getFirebaseEndpoint(month), {
         context: this,
         isArray: true
@@ -90,9 +90,7 @@ class SummaryContainer extends React.Component {
             />
           </ToolbarGroup>
         </Toolbar>
-        <div className="summary-container-graph-wrapper" id="summary-chart">
-          {/* <Chart container="summary-chart" options={this.state.chartOptions} /> */}
-        </div>
+        <div className="summary-container-graph-wrapper" id="summary-chart" />
       </div>
     );
   }
