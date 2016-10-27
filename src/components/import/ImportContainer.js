@@ -142,7 +142,6 @@ class ImportContainer extends React.Component {
       const data = readerLoadEvent.target.result;
       const workbook = XLSX.read(data, { type: 'binary' });
       const transactions = formatRawData(this.state.bank, XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]));
-      // console.log(transactions);
       this.setState({
         transactions
       });
@@ -183,7 +182,6 @@ class ImportContainer extends React.Component {
 
   doImport() {
     const dataAggregatedByMonth = aggregateByMonth(this.state.transactions);
-    console.log(dataAggregatedByMonth);
     const monthArray = Object.keys(dataAggregatedByMonth);
 
     const fetchPromisesArray = [];
@@ -200,7 +198,6 @@ class ImportContainer extends React.Component {
       .all(fetchPromisesArray)
       .then((responses) => {
         const mergedData = mergeData(responses, dataAggregatedByMonth);
-        console.log(mergedData);
 
         const postPromisesArray = [];
         _.forEach(monthArray, (month) => {

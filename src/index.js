@@ -7,6 +7,7 @@ import App from './App';
 import './index.css';
 
 import SummaryContainer from './components/summary/SummaryContainer';
+import TrendContainer from './components/trend/TrendContainer';
 import BillsContainer from './components/BillsContainer';
 import BudgetContainer from './components/BudgetContainer';
 import CashContainer from './components/CashContainer';
@@ -26,6 +27,7 @@ const Root = (
     <Route path="/" component={App}>
       <IndexRoute component={WelcomePage} />
       <Route path="summary" component={SummaryContainer} />
+      <Route path="trend" component={TrendContainer} />
       <Route path="expenses" component={ExpensesContainer} />
       <Route path="income" component={IncomeContainer} />
       <Route path="bills" component={BillsContainer} />

@@ -9,6 +9,7 @@ import AttachMoney from 'material-ui/svg-icons/editor/attach-money';
 import ShoppingBasket from 'material-ui/svg-icons/action/shopping-basket';
 import Group from 'material-ui/svg-icons/social/group';
 import Home from 'material-ui/svg-icons/action/home';
+import TrendIcon from 'material-ui/svg-icons/action/trending-up';
 import Receipt from 'material-ui/svg-icons/action/receipt';
 import GetApp from 'material-ui/svg-icons/action/get-app';
 import BusinessCenter from 'material-ui/svg-icons/places/business-center';
@@ -33,6 +34,7 @@ class SideBar extends React.Component {
     return (
       <SelectableList onSelectionChange={this.listItemClicked} defaultValue="summary">
         <ListItem value="summary" primaryText="Summary" leftIcon={<Home />} />
+        <ListItem value="trend" primaryText="Trend" leftIcon={<TrendIcon />} />
         <Divider />
         <ListItem primaryText="Expenses" value="expenses" leftIcon={<ShoppingBasket />} />
         <ListItem primaryText="Income" value="income" leftIcon={<BusinessCenter />} />

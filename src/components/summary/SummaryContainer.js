@@ -1,4 +1,5 @@
 import moment from 'moment';
+import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
@@ -7,8 +8,8 @@ import PreviousIcon from 'material-ui/svg-icons/av/skip-previous';
 import NextIcon from 'material-ui/svg-icons/av/skip-next';
 
 import base from '../../base';
-import Chart from './Chart';
-import getPieOptions from '../../utils/chartHelper';
+import Chart from '../Chart';
+import { getPieOptions } from '../../utils/chartHelper';
 
 class SummaryContainer extends React.Component {
   constructor() {
@@ -44,11 +45,12 @@ class SummaryContainer extends React.Component {
         isArray: true
       })
       .then((summaryData) => {
-        const pieOptions = getPieOptions(month, summaryData);
+        const newSummaryData = [...summaryData];
+        _.remove(newSummaryData, item => item.name === 'Income');
+        const pieOptions = getPieOptions(month, newSummaryData);
         this.setState({
           month
         });
-        console.log(pieOptions);
         const element = React.createElement(Chart, { container: 'summary-chart', options: pieOptions });
         ReactDOM.render(element, document.getElementById('summary-chart'));
       })

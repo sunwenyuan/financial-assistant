@@ -24,7 +24,6 @@ class IncomeContainer extends React.Component {
     this.goPreviousMonth = this.goPreviousMonth.bind(this);
     this.goNextMonth = this.goNextMonth.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
-    this.renderTableRow = this.renderTableRow.bind(this);
 
     const now = moment().format('YYYY-MM');
     this.state = {
@@ -79,26 +78,6 @@ class IncomeContainer extends React.Component {
     this.getTransactions(nextMonth);
   }
 
-  renderTableRow(record, index) {
-    console.log(this);
-    return (
-      <TableRow key={index}>
-        {
-          tableHeaderMapping
-          .map((header) => {
-            const [headerName] = [...header];
-            const columnKey = `row_${index}_${headerName}`;
-            return (
-              <TableRowColumn key={columnKey}>
-                {record[headerName]}
-              </TableRowColumn>
-              );
-          })
-        }
-      </TableRow>
-      );
-  }
-
   render() {
     return (
       <div className="income-container">
@@ -135,7 +114,22 @@ class IncomeContainer extends React.Component {
             <TableBody displayRowCheckbox={false}>
               {
                 this.state.transactions
-                  .map(this.renderTableRow)
+                  .map((record, index) => (
+                    <TableRow key={index}>
+                      {
+                        tableHeaderMapping
+                        .map((header) => {
+                          const [headerName] = [...header];
+                          const columnKey = `row_${index}_${headerName}`;
+                          return (
+                            <TableRowColumn key={columnKey}>
+                              {record[headerName]}
+                            </TableRowColumn>
+                            );
+                        })
+                      }
+                    </TableRow>
+                  ))
               }
             </TableBody>
           </Table>
