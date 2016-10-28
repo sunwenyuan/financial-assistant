@@ -19,6 +19,7 @@ import PeopleContainer from './components/PeopleContainer';
 import SavingsContainer from './components/SavingsContainer';
 import SettingsContainer from './components/settings/SettingsContainer';
 import WelcomePage from './components/WelcomePage';
+import BackupContainer from './components/backup/BackupContainer';
 
 injectTapEventPlugin();
 
@@ -37,6 +38,7 @@ const Root = (
       <Route path="budget" component={BudgetContainer} />
       <Route path="people" component={PeopleContainer} />
       <Route path="import" component={ImportContainer} />
+      <Route path="backup" component={BackupContainer} />
       <Route path="settings" component={SettingsContainer} />
     </Route>
   </Router>

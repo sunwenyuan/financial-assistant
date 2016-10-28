@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import IconButton from 'material-ui/IconButton';
 import EditIcon from 'material-ui/svg-icons/editor/border-color';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
@@ -189,7 +190,7 @@ class ExpenseCategoriesPanel extends React.Component {
   }
 
   render() {
-    const createCategoryBtn = <FlatButton label="Create Category" onTouchTap={this.startCreateCategory} />;
+    const createCategoryBtn = <RaisedButton primary label="Create Category" onTouchTap={this.startCreateCategory} />;
     return (
       <div>
         <Toolbar>
