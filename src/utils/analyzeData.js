@@ -27,6 +27,8 @@ const insuranceKeywords = ['if', 'trygg-hansa'];
 const investmentKeywords = ['isk'];
 const educationKeywords = ['arvato', 'huddinge kommun', 'trafikskola'];
 
+const deleteKeywords = ['entercard'];
+
 const needAttentionLimit = 2000;
 
 function escapeRegExp(string) {
@@ -51,54 +53,56 @@ function checkForCategory(receiver, keywords) {
 function analyzeData(input) {
   const output = [];
   _.forEach(input, (record) => {
-    const newRecord = { ...record };
-    // check if this record should be kept, record should be removed if receiver is Wenyuan Sun or Ping Jia
-    if (newRecord.receiver.toLowerCase() === 'wenyuan sun' || newRecord.receiver.toLowerCase() === 'ping jia') {
-      return;
+    // If receiver of this record is in deleteKeywords array, just ignore this record, else, pass it on to futher analyze.
+    if (!checkForCategory(record.receiver, deleteKeywords)) {
+      const newRecord = { ...record };
+      // check if this record should be kept, record should be removed if receiver is Wenyuan Sun or Ping Jia
+      if (newRecord.receiver.toLowerCase() === 'wenyuan sun' || newRecord.receiver.toLowerCase() === 'ping jia') {
+        return;
+      }
+
+      // if type is 'in', set category to 'Income'
+      if (newRecord.type === 'in') {
+        newRecord.category = 'Income';
+      }
+
+      const receiver = newRecord.receiver;
+      // check for daily expenses category
+      if (checkForCategory(receiver, dailyExpensesKeywords)) {
+        newRecord.category = 'Daily Expenses';
+      } else if (checkForCategory(receiver, electronicsKeywords)) {
+        newRecord.category = 'Electronics';
+      } else if (checkForCategory(receiver, carKeywords)) {
+        newRecord.category = 'Car';
+      } else if (checkForCategory(receiver, clothingKeywords)) {
+        newRecord.category = 'Clothing';
+      } else if (checkForCategory(receiver, healthKeywords)) {
+        newRecord.category = 'Health';
+      } else if (checkForCategory(receiver, toysKeywords)) {
+        newRecord.category = 'Toys';
+      } else if (checkForCategory(receiver, needAttentionKeywords)) {
+        newRecord.needAttention = true;
+      } else if (checkForCategory(receiver, homeKeywords)) {
+        newRecord.category = 'Home';
+      } else if (checkForCategory(receiver, restaurantKeywords)) {
+        newRecord.category = 'Restaurant';
+      } else if (checkForCategory(receiver, insuranceKeywords)) {
+        newRecord.category = 'Insurance';
+      } else if (checkForCategory(receiver, investmentKeywords)) {
+        newRecord.category = 'Investment';
+      } else if (checkForCategory(receiver, educationKeywords)) {
+        newRecord.category = 'Education';
+      }
+
+      // Set default payfor to 'Whole Family'
+      newRecord.payfor = 'Whole Family';
+
+      // check amount, if it's more than needAttentionLimit, set needAttention to true
+      if (newRecord.amount.greaterThan(needAttentionLimit)) {
+        newRecord.needAttention = true;
+      }
+      output.push(newRecord);
     }
-
-    // if type is 'in', set category to 'Income'
-    if (newRecord.type === 'in') {
-      newRecord.category = 'Income';
-    }
-
-    const receiver = newRecord.receiver;
-    // check for daily expenses category
-    if (checkForCategory(receiver, dailyExpensesKeywords)) {
-      newRecord.category = 'Daily Expenses';
-    } else if (checkForCategory(receiver, electronicsKeywords)) {
-      newRecord.category = 'Electronics';
-    } else if (checkForCategory(receiver, carKeywords)) {
-      newRecord.category = 'Car';
-    } else if (checkForCategory(receiver, clothingKeywords)) {
-      newRecord.category = 'Clothing';
-    } else if (checkForCategory(receiver, healthKeywords)) {
-      newRecord.category = 'Health';
-    } else if (checkForCategory(receiver, toysKeywords)) {
-      newRecord.category = 'Toys';
-    } else if (checkForCategory(receiver, needAttentionKeywords)) {
-      newRecord.needAttention = true;
-    } else if (checkForCategory(receiver, homeKeywords)) {
-      newRecord.category = 'Home';
-    } else if (checkForCategory(receiver, restaurantKeywords)) {
-      newRecord.category = 'Restaurant';
-    } else if (checkForCategory(receiver, insuranceKeywords)) {
-      newRecord.category = 'Insurance';
-    } else if (checkForCategory(receiver, investmentKeywords)) {
-      newRecord.category = 'Investment';
-    } else if (checkForCategory(receiver, educationKeywords)) {
-      newRecord.category = 'Education';
-    }
-
-    // Set default payfor to 'Whole Family'
-    newRecord.payfor = 'Whole Family';
-
-    // check amount, if it's more than needAttentionLimit, set needAttention to true
-    if (newRecord.amount.greaterThan(needAttentionLimit)) {
-      newRecord.needAttention = true;
-    }
-
-    output.push(newRecord);
   });
 
   return output;
