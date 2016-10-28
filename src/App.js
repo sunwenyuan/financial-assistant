@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import { indigo500, indigo100, indigo700, green500, green100, green700 } from 'material-ui/styles/colors';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 
@@ -11,6 +13,20 @@ import AppHeader from './components/AppHeader';
 import base from './base';
 
 const appTitleBase = 'Financial Assistant';
+
+// This replaces the color value on the palette
+// and then update the keys for each component that depends on it.
+// More on Colors: http://www.material-ui.com/#/customization/colors
+const muiTheme = getMuiTheme({
+  palette: {
+    primary1Color: indigo500,
+    primary2Color: indigo100,
+    primary3Color: indigo700,
+    accent1Color: green500,
+    accent2Color: green100,
+    accent3Color: green700
+  }
+});
 
 class App extends Component {
   constructor() {
@@ -95,7 +111,7 @@ class App extends Component {
 
   render() {
     return (
-      <MuiThemeProvider>
+      <MuiThemeProvider muiTheme={muiTheme}>
         {
           this.renderContent()
         }
